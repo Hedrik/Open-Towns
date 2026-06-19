@@ -74,7 +74,7 @@ import xaos.utils.Messages;
 import xaos.utils.Names;
 import xaos.utils.Point3D;
 import xaos.utils.Point3DShort;
-import xaos.utils.UIScale;
+import xaos.utils.TooltipScale;
 import xaos.utils.Utils;
 import xaos.utils.UtilsAL;
 import xaos.utils.UtilsGL;
@@ -1068,11 +1068,35 @@ public static void taskCreated(Task task) {
 		}
 	}
 
+	private static boolean handleWorldZoomMouseWheel() {
+		int wheelDelta = Mouse.getEventDWheel();
+
+		
+		if (wheelDelta == 0) {
+			return false;
+		}
+
+		boolean ctrlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)
+				|| Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+
+		if (!ctrlDown) {
+			return false;
+		}
+		if (wheelDelta > 0) {
+			MainPanel.zoomWorldIn();
+		} else {
+			MainPanel.zoomWorldOut();
+		}
+
+		return true;
+	}
+
 	/**
 	 * Obtiene eventos del mouse y llama al "panel" correspondiente según donde sea
 	 * el click
 	 */
 	private void checkMouseEvents() {
+
 		int mouseX = Mouse.getEventX();
 		int mouseY = UtilsGL.getHeight() - Mouse.getEventY() - 1;
 		int mouseButton;
@@ -1158,6 +1182,9 @@ public static void taskCreated(Task task) {
 					}
 				}
 			}
+			if (handleWorldZoomMouseWheel()) {
+				return;
+			}
 
 			// Wheel
 			if (Mouse.getEventDWheel() > 0) {
@@ -1219,7 +1246,8 @@ public static void taskCreated(Task task) {
 						world.keyPressed(Keyboard.KEY_NONE, UtilsKeyboard.FN_UP);
 					}
 				} else if (mouseY > (UtilsGL.getHeight() - BORDE - 1)) {
-					if (Game.isMouseScrollEarsON() || !UIPanelInputHandler.isMouseCloseToOpenCloseBottomIcon(mouseX, mouseY)) {
+					if (Game.isMouseScrollEarsON()
+							|| !UIPanelInputHandler.isMouseCloseToOpenCloseBottomIcon(mouseX, mouseY)) {
 						if (getCurrentState() == STATE_SHOWING_CONTEXT_MENU) {
 							if (!(mouseX >= getCurrentContextMenu().getX()
 									&& mouseX < (getCurrentContextMenu().getX() + getCurrentContextMenu().getWidth())
@@ -1265,14 +1293,14 @@ public static void taskCreated(Task task) {
 					}
 				} else {
 					if (iKEY == Keyboard.KEY_ADD || iKEY == Keyboard.KEY_EQUALS) {
-						UIScale.set(UIScale.get() + 0.25f);
-						System.out.println("UI scale: " + UIScale.get());
+						TooltipScale.set(TooltipScale.get() + 0.25f);
+						
 						continue;
 					}
 
 					if (iKEY == Keyboard.KEY_SUBTRACT || iKEY == Keyboard.KEY_MINUS) {
-						UIScale.set(UIScale.get() - 0.25f);
-						System.out.println("UI scale: " + UIScale.get());
+						TooltipScale.set(TooltipScale.get() - 0.25f);
+					
 						continue;
 					}
 

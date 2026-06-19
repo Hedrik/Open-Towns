@@ -48,6 +48,8 @@ import xaos.utils.UtilsGL;
 import xaos.utils.UtilsIniHeaders;
 import static xaos.panels.UI.UIPanelState.*;
 import static xaos.panels.UI.UIPanelInputHandler.*;
+import static xaos.panels.UI.UIPanelScaler.*;
+
 
 public final class UIPanel {
 
@@ -431,25 +433,42 @@ public final class UIPanel {
 		checkBlinkBottom = (blinkTurns >= MAX_BLINK_TURNS / 2)
 				&& TutorialFlow.isBlinkBottom();
 		if (UIPanel.isBottomMenuPanelActive()) {
-			iCurrentTexture = BottomMenuPanel.renderPanel(mouseX, mouseY, mousePanel, iCurrentTexture);
+			iCurrentTexture = BottomPanel.renderPanel(mouseX, mouseY, mousePanel, iCurrentTexture);
 		}
 
-		// Rendereamos el botoncito para hacer visible/invisible el bottom panel
-		if (UIPanel.isBottomMenuPanelLocked()) {
-			iCurrentTexture = UtilsGL.setTexture(tileOpenBottomMenuON, iCurrentTexture);
-			drawTile(tileOpenBottomMenuON, tileOpenCloseBottomMenuPoint, tileOpenBottomMenuON.getTileWidth(),
-					tileOpenBottomMenuON.getTileHeight(), mousePanel == MOUSE_BOTTOM_OPENCLOSE);
-		} else {
-			iCurrentTexture = UtilsGL.setTexture(tileOpenBottomMenu, iCurrentTexture);
-			if (checkBlinkBottom) {
-				UtilsGL.setColorRed();
-			}
-			drawTile(tileOpenBottomMenu, tileOpenCloseBottomMenuPoint, tileOpenBottomMenu.getTileWidth(),
-					tileOpenBottomMenu.getTileHeight(), mousePanel == MOUSE_BOTTOM_OPENCLOSE);
-			if (checkBlinkBottom) {
-				UtilsGL.unsetColor();
-			}
-		}
+	// Rendereamos el botoncito para hacer visible/invisible el bottom panel
+Point scaledBottomOpenClosePoint = anchorFromCentreXAndBottom(
+		tileOpenCloseBottomMenuPoint,
+		tileOpenBottomMenu.getTileWidth(),
+		tileOpenBottomMenu.getTileHeight(),
+		ui(tileOpenBottomMenu.getTileWidth()),
+		ui(tileOpenBottomMenu.getTileHeight()));
+
+if (UIPanel.isBottomMenuPanelLocked()) {
+	iCurrentTexture = UtilsGL.setTexture(tileOpenBottomMenuON, iCurrentTexture);
+
+	drawScaledTile(
+			tileOpenBottomMenuON,
+			scaledBottomOpenClosePoint,
+			ui(tileOpenBottomMenuON.getTileWidth()),
+			ui(tileOpenBottomMenuON.getTileHeight()));
+} else {
+	iCurrentTexture = UtilsGL.setTexture(tileOpenBottomMenu, iCurrentTexture);
+
+	if (checkBlinkBottom) {
+		UtilsGL.setColorRed();
+	}
+
+	drawScaledTile(
+			tileOpenBottomMenu,
+			scaledBottomOpenClosePoint,
+			ui(tileOpenBottomMenu.getTileWidth()),
+			ui(tileOpenBottomMenu.getTileHeight()));
+
+	if (checkBlinkBottom) {
+		UtilsGL.unsetColor();
+	}
+}
 
 		/*
 		 * MINIMAP (textures)
@@ -469,7 +488,7 @@ public final class UIPanel {
 		/*
 		 * MENU (right)
 		 */
-		renderMenuPanel(mouseX, mouseY, mousePanel);
+		RightPanel.renderMenuPanel(mouseX, mouseY, mousePanel);
 
 		// Possible mini icon blinks?
 		// Blink
@@ -835,7 +854,7 @@ public final class UIPanel {
 		 * PANELS, PRODUCTION PANEL, PRIORITIES PANEL, TRADE_PANEL (este va encima de
 		 * todo siempre)
 		 */
-		renderProductionPanel(mouseX, mouseY, mousePanel);
+		LeftPanel.renderProductionPanel(mouseX, mouseY, mousePanel);
 
 		if (isPilePanelActive()) {
 			renderPilePanel(mouseX, mouseY, mousePanel);
@@ -873,447 +892,136 @@ public final class UIPanel {
 		TooltipRenderer.renderTooltips(mouseX, mouseY, mousePanel);
 	}
 
-	public void renderMenuPanel(int mouseX, int mouseY, int mousePanel) {
-		checkBlinkRight = (blinkTurns >= MAX_BLINK_TURNS / 2) && TutorialFlow.isBlinkRight();
+	
 
-		if (isMenuPanelActive()) {
 
-			// XAVI GL11.glColor4f (1, 1, 1, 1);
-			int iCurrentTexture = tileMenuPanel[0].getTextureID();
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, iCurrentTexture);
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-			renderBackground(tileMenuPanel, menuPanelPoint, MENU_PANEL_WIDTH, MENU_PANEL_HEIGHT);
 
-			int iItemMenu;
-			if (mousePanel == MOUSE_MENU_PANEL_ITEMS) {
-				iItemMenu = isMouseOnMenuItems(mouseX, mouseY);
-			} else {
-				iItemMenu = -1;
-			}
+/**
+ * Renderiza el background con los 8 tiles de los lados y esquinas
+ * 0: background
+ * 1: N
+ * 2: S
+ * 3: E
+ * 4: W
+ * 5: NE
+ * 6: NW
+ * 7: SE
+ * 8: SW
+ *
+ * @param tiles
+ */
+public static void renderBackground(Tile[] tiles, Point point, int width, int height) {
+	int iEdgeWidth = ui(tiles[6].getTileWidth());
+	int iEdgeHeight = ui(tiles[6].getTileHeight());
 
-			// Items
-			if (menuPanelMenu != null) {
-				int iMenu;
-				Point point;
-				bucle1: for (int y = 0; y < MENU_PANEL_NUM_ITEMS_Y; y++) {
-					for (int x = 0; x < MENU_PANEL_NUM_ITEMS_X; x++) {
-						iMenu = (y * MENU_PANEL_NUM_ITEMS_X) + x;
-						if (iMenu >= menuPanelMenu.getItems().size()) {
-							break bucle1;
-						}
-						point = menuPanelItemsPosition.get(iMenu);
+	// Background
+	Tile tile = tiles[0];
+	UtilsGL.drawTexture(
+			point.x + iEdgeWidth,
+			point.y + iEdgeHeight,
+			point.x + width - iEdgeWidth,
+			point.y + height - iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-						// Round button
-						if (menuPanelMenu.getItems().get(iMenu).getType() == SmartMenu.TYPE_MENU) {
-							iCurrentTexture = UtilsGL.setTexture(tileBottomItemSM, iCurrentTexture);
-							if (checkBlinkRight
-									&& TutorialFlow.currentBlinkRight(menuPanelMenu.getItems().get(iMenu).getID())) {
-								UtilsGL.setColorRed();
-								drawTile(tileBottomItemSM, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(iItemMenu == iMenu));
-								UtilsGL.unsetColor();
-							} else {
-								drawTile(tileBottomItemSM, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(iItemMenu == iMenu));
-							}
-						} else {
-							iCurrentTexture = UtilsGL.setTexture(tileBottomItem, iCurrentTexture);
+	// N
+	tile = tiles[1];
+	UtilsGL.drawTexture(
+			point.x + iEdgeWidth,
+			point.y,
+			point.x + width - iEdgeWidth,
+			point.y + iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-							if (checkBlinkRight
-									&& TutorialFlow.currentBlinkRight(menuPanelMenu.getItems().get(iMenu).getID())) {
-								UtilsGL.setColorRed();
-								drawTile(tileBottomItem, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(iItemMenu == iMenu));
-								UtilsGL.unsetColor();
-							} else {
-								drawTile(tileBottomItem, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(iItemMenu == iMenu));
-							}
-						}
+	// S
+	tile = tiles[2];
+	UtilsGL.drawTexture(
+			point.x + iEdgeWidth,
+			point.y + height - iEdgeHeight,
+			point.x + width - iEdgeWidth,
+			point.y + height,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-						// Icono
-						Tile tile = menuPanelMenu.getItems().get(iMenu).getIcon();
-						if (tile != null
-								&& menuPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_UI) { // MENU
-							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
-							drawTile(tile, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT, (iItemMenu == iMenu));
-						}
-					}
-				}
-			}
+	// E
+	tile = tiles[3];
+	UtilsGL.drawTexture(
+			point.x + width - iEdgeWidth,
+			point.y + iEdgeHeight,
+			point.x + width,
+			point.y + height - iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-			// MENU
-			if (menuPanelMenu != null) {
-				int iMenu;
-				Tile tile;
-				Point point;
-				bucle1: for (int y = 0; y < MENU_PANEL_NUM_ITEMS_Y; y++) {
-					for (int x = 0; x < MENU_PANEL_NUM_ITEMS_X; x++) {
-						iMenu = (y * MENU_PANEL_NUM_ITEMS_X) + x;
-						if (iMenu >= menuPanelMenu.getItems().size()) {
-							break bucle1;
-						}
-						point = menuPanelItemsPosition.get(iMenu);
-						// Icono
-						tile = menuPanelMenu.getItems().get(iMenu).getIcon();
-						if (tile != null
-								&& menuPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_ITEM) { // ICONO
-							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
-							drawTile(tile, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT, (iItemMenu == iMenu));
-						}
-					}
-				}
-			}
+	// W
+	tile = tiles[4];
+	UtilsGL.drawTexture(
+			point.x,
+			point.y + iEdgeHeight,
+			point.x + iEdgeWidth,
+			point.y + height - iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-			UtilsGL.glEnd();
-		}
+	// NE
+	tile = tiles[5];
+	UtilsGL.drawTexture(
+			point.x + width - iEdgeWidth,
+			point.y,
+			point.x + width,
+			point.y + iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-		// Botoncito open/close
-		if (isMenuPanelLocked()) {
-			// Close menu icon
-			// XAVI GL11.glColor4f (1, 1, 1, 1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, tileOpenRightMenuON.getTextureID());
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-			drawTile(tileOpenRightMenuON, tileOpenCloseRightMenuPoint, tileOpenRightMenuON.getTileWidth(),
-					tileOpenRightMenuON.getTileHeight(), mousePanel == MOUSE_MENU_OPENCLOSE);
-			UtilsGL.glEnd();
-		} else {
-			// XAVI GL11.glColor4f (1, 1, 1, 1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, tileOpenRightMenu.getTextureID());
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-			if (checkBlinkRight) {
-				UtilsGL.setColorRed();
-			}
-			drawTile(tileOpenRightMenu, tileOpenCloseRightMenuPoint, tileOpenRightMenu.getTileWidth(),
-					tileOpenRightMenu.getTileHeight(), mousePanel == MOUSE_MENU_OPENCLOSE);
-			if (checkBlinkRight) {
-				UtilsGL.unsetColor();
-			}
-			UtilsGL.glEnd();
-		}
-	}
+	// NW
+	tile = tiles[6];
+	UtilsGL.drawTexture(
+			point.x,
+			point.y,
+			point.x + iEdgeWidth,
+			point.y + iEdgeHeight,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-	public void renderProductionPanel(int mouseX, int mouseY, int mousePanel) {
-		checkBlinkProduction = (blinkTurns >= MAX_BLINK_TURNS / 2) && TutorialFlow.isBlinkProduction();
+	// SE
+	tile = tiles[7];
+	UtilsGL.drawTexture(
+			point.x + width - iEdgeWidth,
+			point.y + height - iEdgeHeight,
+			point.x + width,
+			point.y + height,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
 
-		if (isProductionPanelActive()) {
-			int iCurrentTexture = tileProductionPanel[0].getTextureID();
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, iCurrentTexture);
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-
-			renderBackground(tileProductionPanel, productionPanelPoint, PRODUCTION_PANEL_WIDTH,
-					PRODUCTION_PANEL_HEIGHT);
-
-			// Items
-			int iMenu;
-			Point point;
-			SmartMenu smItem;
-			Point pItem;
-			if (mousePanel == MOUSE_PRODUCTION_PANEL_ITEMS || mousePanel == MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_AUTOMATED
-					|| mousePanel == MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_REGULAR
-					|| mousePanel == MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_AUTOMATED
-					|| mousePanel == MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_REGULAR) {
-				pItem = isMouseOnProductionItems(mouseX, mouseY);
-			} else {
-				pItem = null;
-			}
-
-			if (productionPanelMenu != null) {
-				Tile tile;
-				bucle1: for (int y = 0; y < PRODUCTION_PANEL_NUM_ITEMS_Y; y++) {
-					for (int x = 0; x < PRODUCTION_PANEL_NUM_ITEMS_X; x++) {
-						iMenu = (y * PRODUCTION_PANEL_NUM_ITEMS_X) + x;
-						if (iMenu >= productionPanelMenu.getItems().size()) {
-							break bucle1;
-						}
-						smItem = productionPanelMenu.getItems().get(iMenu);
-
-						point = productionPanelItemsPosition.get(iMenu);
-						boolean bBlinkItem = checkBlinkProduction && TutorialFlow
-								.currentBlinkProduction(productionPanelMenu.getItems().get(iMenu).getID());
-						TutorialFlow tutFlow = null;
-						if (bBlinkItem && Game.getCurrentMissionData() != null && ImagesPanel.getCurrentFlowIndex() >= 0
-								&& ImagesPanel.getCurrentFlowIndex() < Game.getCurrentMissionData().getTutorialFlows()
-										.size()) {
-							tutFlow = Game.getCurrentMissionData().getTutorialFlows()
-									.get(ImagesPanel.getCurrentFlowIndex());
-						}
-
-						// Round button
-						if (productionPanelMenu.getItems().get(iMenu).getType() == SmartMenu.TYPE_MENU) {
-							iCurrentTexture = UtilsGL.setTexture(tileBottomItemSM, iCurrentTexture);
-							if (bBlinkItem) {
-								UtilsGL.setColorRed();
-								drawTile(tileBottomItemSM, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-								UtilsGL.unsetColor();
-							} else {
-								drawTile(tileBottomItemSM, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-							}
-						} else {
-							iCurrentTexture = UtilsGL.setTexture(tileBottomItem, iCurrentTexture);
-							if (bBlinkItem) {
-								UtilsGL.setColorRed();
-								drawTile(tileBottomItem, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-								UtilsGL.unsetColor();
-							} else {
-								drawTile(tileBottomItem, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-										(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-							}
-						}
-
-						// Icono
-						tile = productionPanelMenu.getItems().get(iMenu).getIcon();
-						if (tile != null
-								&& productionPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_UI) {
-							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
-							drawTile(tile, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-									(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-						}
-
-						point = productionPanelItemsPlusRegularPosition.get(iMenu);
-						if (point.x != -1) {
-							// Regular
-							iCurrentTexture = UtilsGL.setTexture(tileProductionPanelPlusIcon, iCurrentTexture);
-							if (tutFlow != null && tutFlow.isBlinkProductionRegularPlus()) {
-								UtilsGL.setColorRed();
-							}
-							drawTile(tileProductionPanelPlusIcon, point, ICON_WIDTH, ICON_HEIGHT, (pItem != null
-									&& pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_REGULAR && pItem.y == iMenu));
-							if (tutFlow != null && tutFlow.isBlinkProductionRegularPlus()) {
-								UtilsGL.unsetColor();
-							}
-
-							// Automated
-							if (tutFlow != null && tutFlow.isBlinkProductionAutomatedPlus()) {
-								UtilsGL.setColorRed();
-							}
-							drawTile(tileProductionPanelPlusIcon, productionPanelItemsPlusAutomatedPosition.get(iMenu),
-									ICON_WIDTH, ICON_HEIGHT,
-									(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_AUTOMATED
-											&& pItem.y == iMenu));
-							if (tutFlow != null && tutFlow.isBlinkProductionAutomatedPlus()) {
-								UtilsGL.unsetColor();
-							}
-
-							iCurrentTexture = UtilsGL.setTexture(tileProductionPanelMinusIcon, iCurrentTexture);
-
-							// Regular
-							if (tutFlow != null && tutFlow.isBlinkProductionRegularMinus()) {
-								UtilsGL.setColorRed();
-							}
-							drawTile(tileProductionPanelMinusIcon, productionPanelItemsMinusRegularPosition.get(iMenu),
-									ICON_WIDTH, ICON_HEIGHT,
-									(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_REGULAR
-											&& pItem.y == iMenu));
-							if (tutFlow != null && tutFlow.isBlinkProductionRegularMinus()) {
-								UtilsGL.unsetColor();
-							}
-
-							// Automated
-							if (tutFlow != null && tutFlow.isBlinkProductionAutomatedMinus()) {
-								UtilsGL.setColorRed();
-							}
-							drawTile(tileProductionPanelMinusIcon,
-									productionPanelItemsMinusAutomatedPosition.get(iMenu), ICON_WIDTH, ICON_HEIGHT,
-									(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_AUTOMATED
-											&& pItem.y == iMenu));
-							if (tutFlow != null && tutFlow.isBlinkProductionAutomatedMinus()) {
-								UtilsGL.unsetColor();
-							}
-						}
-					}
-				}
-			}
-			UtilsGL.glEnd();
-
-			/*
-			 * ITEMS TEXTURES
-			 */
-			if (productionPanelMenu != null) {
-				iCurrentTexture = Game.TEXTURE_FONT_ID;
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, Game.TEXTURE_FONT_ID);
-				GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-				UtilsGL.glBegin(GL11.GL_QUADS);
-
-				bucle1: for (int y = 0; y < PRODUCTION_PANEL_NUM_ITEMS_Y; y++) {
-					for (int x = 0; x < PRODUCTION_PANEL_NUM_ITEMS_X; x++) {
-						iMenu = (y * PRODUCTION_PANEL_NUM_ITEMS_X) + x;
-						if (iMenu >= productionPanelMenu.getItems().size()) {
-							break bucle1;
-						}
-						point = productionPanelItemsPosition.get(iMenu);
-						// Icono
-						Tile tile = productionPanelMenu.getItems().get(iMenu).getIcon();
-						if (tile != null && productionPanelMenu.getItems().get(iMenu)
-								.getIconType() == SmartMenu.ICON_TYPE_ITEM) {
-							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
-							drawTile(tile, point, BOTTOM_ITEM_WIDTH, BOTTOM_ITEM_HEIGHT,
-									(pItem != null && pItem.x == MOUSE_PRODUCTION_PANEL_ITEMS && pItem.y == iMenu));
-						}
-					}
-				}
-				UtilsGL.glEnd();
-			}
-
-			/*
-			 * NUMBERS
-			 */
-			if (productionPanelMenu != null) {
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, Game.TEXTURE_FONT_ID);
-				GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-				UtilsGL.glBegin(GL11.GL_QUADS);
-
-				String strValue;
-				HashMap<String, Integer> hmItemsOnQueue = Game.getWorld().getTaskManager().getItemsOnRegularQueue();
-				Integer iItemQueue;
-				bucle1: for (int y = 0; y < PRODUCTION_PANEL_NUM_ITEMS_Y; y++) {
-					for (int x = 0; x < PRODUCTION_PANEL_NUM_ITEMS_X; x++) {
-						iMenu = (y * PRODUCTION_PANEL_NUM_ITEMS_X) + x;
-						if (iMenu >= productionPanelMenu.getItems().size()) {
-							break bucle1;
-						}
-						smItem = productionPanelMenu.getItems().get(iMenu);
-						if (smItem.getType() == SmartMenu.TYPE_ITEM) {
-							if (!smItem.getCommand().equalsIgnoreCase(CommandPanel.COMMAND_BACK)) {
-								point = productionPanelItemsPosition.get(iMenu);
-								iItemQueue = hmItemsOnQueue.get(smItem.getParameter());
-								if (iItemQueue == null) {
-									strValue = "0"; //$NON-NLS-1$
-								} else {
-									strValue = Integer.toString(iItemQueue);
-								}
-								// Regular
-								UtilsGL.drawStringWithBorder(strValue,
-										point.x - ICON_WIDTH / 2 - (UtilFont.getWidth(strValue)) / 2,
-										point.y + PRODUCTION_PANEL_ITEM_HEIGHT / 2 - UtilFont.MAX_HEIGHT / 2,
-										ColorGL.WHITE, ColorGL.BLACK);
-
-								// Automated
-								strValue = Integer.toString(Game.getWorld().getTaskManager()
-										.getNumItemsOnAutomatedQueue(smItem.getParameter()));
-								UtilsGL.drawStringWithBorder(strValue,
-										point.x + PRODUCTION_PANEL_ITEM_WIDTH + ICON_WIDTH / 2
-												- (UtilFont.getWidth(strValue)) / 2,
-										point.y + PRODUCTION_PANEL_ITEM_HEIGHT / 2 - UtilFont.MAX_HEIGHT / 2,
-										ColorGL.WHITE, ColorGL.BLACK);
-
-								// Items in world
-								ActionManagerItem ami = ActionManager.getItem(smItem.getParameter());
-								if (ami != null && ami.getGeneratedItem() != null) {
-									int iNum = Item.getNumItems(UtilsIniHeaders.getIntIniHeader(ami.getGeneratedItem()),
-											false, World.MAP_DEPTH);
-									if (iNum > 0) {
-										strValue = Integer.toString(iNum);
-										UtilsGL.drawStringWithBorder(strValue,
-												point.x + PRODUCTION_PANEL_ITEM_WIDTH / 2
-														- (UtilFont.getWidth(strValue)) / 2,
-												point.y + PRODUCTION_PANEL_ITEM_HEIGHT / 4 - UtilFont.MAX_HEIGHT / 2,
-												ColorGL.WHITE, ColorGL.BLACK);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				UtilsGL.glEnd();
-			}
-		}
-
-		if (isProductionPanelLocked()) {
-			// Close icon
-			// XAVI GL11.glColor4f (1, 1, 1, 1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, tileOpenProductionPanelON.getTextureID());
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-			drawTile(tileOpenProductionPanelON, tileOpenCloseProductionPanelPoint,
-					tileOpenProductionPanelON.getTileWidth(), tileOpenProductionPanelON.getTileHeight(),
-					mousePanel == MOUSE_PRODUCTION_OPENCLOSE);
-			UtilsGL.glEnd();
-		} else {
-			// Open icon
-			// XAVI GL11.glColor4f (1, 1, 1, 1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, tileOpenProductionPanel.getTextureID());
-			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-			UtilsGL.glBegin(GL11.GL_QUADS);
-			if (checkBlinkProduction) {
-				UtilsGL.setColorRed();
-			}
-			drawTile(tileOpenProductionPanel, tileOpenCloseProductionPanelPoint, tileOpenProductionPanel.getTileWidth(),
-					tileOpenProductionPanel.getTileHeight(), mousePanel == MOUSE_PRODUCTION_OPENCLOSE);
-			if (checkBlinkProduction) {
-				UtilsGL.unsetColor();
-			}
-			UtilsGL.glEnd();
-		}
-	}
-
-	/**
-	 * Renderiza el background con los 8 tiles de los lados y esquinas 0: background
-	 * 1: N 2: S 3: E 4: W 5: NE 6: NW 7: SE 8: SW
-	 * 
-	 * @param tiles
-	 */
-	public static void renderBackground(Tile[] tiles, Point point, int width, int height) {
-		int iEdgeWidth = tiles[6].getTileWidth();
-		int iEdgeHeight = tiles[6].getTileHeight();
-
-		// Background
-		Tile tile = tiles[0];
-		UtilsGL.drawTexture(point.x + iEdgeWidth, point.y + iEdgeHeight, point.x + width - iEdgeWidth,
-				point.y + height - iEdgeHeight, tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(),
-				tile.getTileSetTexY1());
-
-		// N
-		tile = tiles[1];
-		UtilsGL.drawTexture(point.x + iEdgeWidth, point.y, point.x + width - iEdgeWidth, point.y + iEdgeHeight,
-				tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(), tile.getTileSetTexY1());
-
-		// S
-		tile = tiles[2];
-		UtilsGL.drawTexture(point.x + iEdgeWidth, point.y + height - iEdgeHeight, point.x + width - iEdgeWidth,
-				point.y + height, tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(),
-				tile.getTileSetTexY1());
-
-		// E
-		tile = tiles[3];
-		UtilsGL.drawTexture(point.x + width - iEdgeWidth, point.y + iEdgeHeight, point.x + width,
-				point.y + height - iEdgeHeight, tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(),
-				tile.getTileSetTexY1());
-
-		// W
-		tile = tiles[4];
-		UtilsGL.drawTexture(point.x, point.y + iEdgeHeight, point.x + iEdgeWidth, point.y + height - iEdgeHeight,
-				tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(), tile.getTileSetTexY1());
-
-		// NE
-		tile = tiles[5];
-		UtilsGL.drawTexture(point.x + width - iEdgeWidth, point.y, point.x + width, point.y + iEdgeHeight,
-				tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(), tile.getTileSetTexY1());
-
-		// NW
-		tile = tiles[6];
-		UtilsGL.drawTexture(point.x, point.y, point.x + iEdgeWidth, point.y + iEdgeHeight, tile.getTileSetTexX0(),
-				tile.getTileSetTexY0(), tile.getTileSetTexX1(), tile.getTileSetTexY1());
-
-		// SE
-		tile = tiles[7];
-		UtilsGL.drawTexture(point.x + width - iEdgeWidth, point.y + height - iEdgeHeight, point.x + width,
-				point.y + height, tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(),
-				tile.getTileSetTexY1());
-
-		// SW
-		tile = tiles[8];
-		UtilsGL.drawTexture(point.x, point.y + height - iEdgeHeight, point.x + iEdgeWidth, point.y + height,
-				tile.getTileSetTexX0(), tile.getTileSetTexY0(), tile.getTileSetTexX1(), tile.getTileSetTexY1());
-	}
+	// SW
+	tile = tiles[8];
+	UtilsGL.drawTexture(
+			point.x,
+			point.y + height - iEdgeHeight,
+			point.x + iEdgeWidth,
+			point.y + height,
+			tile.getTileSetTexX0(),
+			tile.getTileSetTexY0(),
+			tile.getTileSetTexX1(),
+			tile.getTileSetTexY1());
+}
 
 	public void renderTradePanel(int mouseX, int mouseY, int mousePanel) {
 		Point pItem = isMouseOnTradeButtons(mouseX, mouseY);

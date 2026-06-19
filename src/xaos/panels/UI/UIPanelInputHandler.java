@@ -39,7 +39,109 @@ import xaos.utils.Messages;
 import java.awt.Color;
 
 public class UIPanelInputHandler {
-    public static void mousePressed(int x, int y, int mouseButton) {
+
+	private static int ui(int value) {
+		return UIScaler.ui(value);
+	}
+
+	private static Point getScaledMenuPanelPoint() {
+		return UIPanelScaler.anchorFromRight(
+				UIPanelState.menuPanelPoint,
+				UIPanelState.MENU_PANEL_WIDTH,
+				UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH));
+	}
+
+	private static Point getScaledMenuItemPoint(int itemIndex) {
+		return UIPanelScaler.scalePointFromAnchor(
+				UIPanelState.menuPanelItemsPosition.get(itemIndex),
+				UIPanelState.menuPanelPoint,
+				getScaledMenuPanelPoint());
+	}
+
+	private static Point getScaledRightMenuOpenClosePoint() {
+		return UIPanelScaler.scalePointFromAnchor(
+				UIPanelState.tileOpenCloseRightMenuPoint,
+				UIPanelState.menuPanelPoint,
+				getScaledMenuPanelPoint());
+	}
+
+	private static Point getScaledProductionPanelPoint() {
+		/*
+		 * Production panel is left anchored.
+		 * It keeps its original top-left point and grows right/down.
+		 */
+		return UIPanelState.productionPanelPoint;
+	}
+
+	private static Point getScaledProductionPoint(Point originalPoint) {
+		return UIPanelScaler.scalePointFromAnchor(
+				originalPoint,
+				UIPanelState.productionPanelPoint,
+				getScaledProductionPanelPoint());
+	}
+
+	private static Point getScaledProductionItemPoint(int itemIndex) {
+		return getScaledProductionPoint(
+				UIPanelState.productionPanelItemsPosition.get(itemIndex));
+	}
+
+	private static Point getScaledProductionPlusRegularPoint(int itemIndex) {
+		return getScaledProductionPoint(
+				UIPanelState.productionPanelItemsPlusRegularPosition.get(itemIndex));
+	}
+
+	private static Point getScaledProductionMinusRegularPoint(int itemIndex) {
+		return getScaledProductionPoint(
+				UIPanelState.productionPanelItemsMinusRegularPosition.get(itemIndex));
+	}
+
+	private static Point getScaledProductionPlusAutomatedPoint(int itemIndex) {
+		return getScaledProductionPoint(
+				UIPanelState.productionPanelItemsPlusAutomatedPosition.get(itemIndex));
+	}
+
+	private static Point getScaledProductionMinusAutomatedPoint(int itemIndex) {
+		return getScaledProductionPoint(
+				UIPanelState.productionPanelItemsMinusAutomatedPosition.get(itemIndex));
+	}
+
+	private static Point getScaledProductionOpenClosePoint() {
+		return getScaledProductionPoint(
+				UIPanelState.tileOpenCloseProductionPanelPoint);
+	}
+
+	private static int getScaledBottomPanelWidth() {
+		return ui(UIPanelState.BOTTOM_PANEL_WIDTH);
+	}
+
+	private static int getScaledBottomPanelHeight() {
+		return ui(UIPanelState.BOTTOM_PANEL_HEIGHT);
+	}
+
+	private static int getScaledBottomPanelX() {
+		int originalPanelCenterX = UIPanelState.bottomPanelX + (UIPanelState.BOTTOM_PANEL_WIDTH / 2);
+		return originalPanelCenterX - (getScaledBottomPanelWidth() / 2);
+	}
+
+	private static int getScaledBottomPanelY() {
+		return UIPanelState.bottomPanelY - (getScaledBottomPanelHeight() - UIPanelState.BOTTOM_PANEL_HEIGHT);
+	}
+
+	private static Point getScaledBottomItemPoint(int itemIndex) {
+		int bottomPanelX = getScaledBottomPanelX();
+		int bottomPanelY = getScaledBottomPanelY();
+
+		Point originalPoint = UIPanelState.bottomPanelItemsPosition.get(itemIndex);
+
+		int originalOffsetX = originalPoint.x - UIPanelState.bottomPanelX;
+		int originalOffsetY = originalPoint.y - UIPanelState.bottomPanelY;
+
+		return new Point(
+				bottomPanelX + ui(originalOffsetX),
+				bottomPanelY + ui(originalOffsetY));
+	}
+
+	public static void mousePressed(int x, int y, int mouseButton) {
 		int iPanel = isMouseOnAPanel(x, y);
 
 		if (iPanel == MOUSE_NONE) {
@@ -1148,7 +1250,7 @@ public class UIPanelInputHandler {
 		 */
 		if (iPanel == MOUSE_PRODUCTION_OPENCLOSE) {
 			setProductionPanelLocked(!isProductionPanelLocked());
-			//  setProductionPanelActive (!isProductionPanelActive ());
+			// setProductionPanelActive (!isProductionPanelActive ());
 			UtilsAL.play(UtilsAL.SOURCE_FX_CLICK);
 			return;
 		}
@@ -1742,7 +1844,8 @@ public class UIPanelInputHandler {
 			return;
 		}
 	}
-public static boolean keyPressed(int tecla) {
+
+	public static boolean keyPressed(int tecla) {
 		if (tecla == Keyboard.KEY_ESCAPE) {
 			if (imagesPanel != null && ImagesPanel.isVisible()) {
 				ImagesPanel.setVisible(false);
@@ -1774,7 +1877,8 @@ public static boolean keyPressed(int tecla) {
 
 		return false;
 	}
-public static int isMouseOnAPanel(int x, int y) {
+
+	public static int isMouseOnAPanel(int x, int y) {
 		return isMouseOnAPanel(x, y, false);
 	}
 
@@ -1969,34 +2073,34 @@ public static int isMouseOnAPanel(int x, int y) {
 		 * PRODUCTION PANEL
 		 */
 		if (isProductionPanelActive()) {
-			
-			if (isMouseOnAnIcon(x, y, tileOpenCloseProductionPanelPoint, tileOpenProductionPanelON,
-					tileOpenProductionPanelONAlpha)) {
+			if (isMouseOnProductionOpenClose(x, y, tileOpenProductionPanelON)) {
 				if (doEdgeMenusStuff) {
-					// Cerramos los menús no locked
 					closeNonLockedMenus(true, true, false);
 					delayTime = 0;
 				}
+
 				return MOUSE_PRODUCTION_OPENCLOSE;
 			}
+
 			if (isMouseOnProductionPanel(x, y)) {
 				if (doEdgeMenusStuff) {
-					// Cerramos los menús no locked
 					closeNonLockedMenus(true, true, false);
 					delayTime = 0;
 				}
 
 				Point p = isMouseOnProductionItems(x, y);
+
 				if (p != null) {
 					return p.x;
 				}
 
 				return MOUSE_PRODUCTION_PANEL;
 			}
+
 			if (doEdgeMenusStuff) {
 				if (delayTime > (Game.FPS_INGAME / 8) * 6) {
-					if (!isProductionPanelLocked() && !isMouseOnAnIcon(x, y, tileOpenCloseProductionPanelPoint,
-							tileOpenProductionPanel, tileOpenProductionPanelAlpha)) {
+					if (!isProductionPanelLocked()
+							&& !isMouseOnProductionOpenClose(x, y, tileOpenProductionPanel)) {
 						delayTime = 0;
 						setProductionPanelActive(false);
 					}
@@ -2004,19 +2108,16 @@ public static int isMouseOnAPanel(int x, int y) {
 			}
 		} else {
 			if (doEdgeMenusStuff) {
-				
-				if (isMouseOnAnIcon(x, y, tileOpenCloseProductionPanelPoint, tileOpenProductionPanel,
-						tileOpenProductionPanelAlpha)) {
+				if (isMouseOnProductionOpenClose(x, y, tileOpenProductionPanel)) {
 					setProductionPanelActive(true);
 
-					// Cerramos los menús no locked
 					closeNonLockedMenus(true, true, false);
 					delayTime = 0;
+
 					return MOUSE_PRODUCTION_OPENCLOSE;
 				}
 			}
 		}
-
 		// BOTTOM
 		if (isBottomMenuPanelActive()) {
 			if (isMouseOnBottomLeftScroll(x, y)) {
@@ -2102,7 +2203,6 @@ public static int isMouseOnAPanel(int x, int y) {
 				}
 			}
 		}
-
 		// MENU (right)
 		if (isMenuPanelActive()) {
 			if (isMouseOnMenuItems(x, y) != -1) {
@@ -2113,6 +2213,7 @@ public static int isMouseOnAPanel(int x, int y) {
 				}
 				return MOUSE_MENU_PANEL_ITEMS;
 			}
+
 			if (isMouseOnMenuPanel(x, y)) {
 				if (doEdgeMenusStuff) {
 					// Cerramos los menús no locked
@@ -2121,7 +2222,8 @@ public static int isMouseOnAPanel(int x, int y) {
 				}
 				return MOUSE_MENU_PANEL;
 			}
-			if (isMouseOnAnIcon(x, y, tileOpenCloseRightMenuPoint, tileOpenRightMenuON, tileOpenRightMenuONAlpha)) {
+
+			if (isMouseOnRightMenuOpenClose(x, y, tileOpenRightMenuON)) {
 				if (doEdgeMenusStuff) {
 					// Cerramos los menús no locked
 					closeNonLockedMenus(true, false, true);
@@ -2132,8 +2234,7 @@ public static int isMouseOnAPanel(int x, int y) {
 
 			if (doEdgeMenusStuff) {
 				if (delayTime > (Game.FPS_INGAME / 8) * 6) {
-					if (!isMenuPanelLocked() && !isMouseOnAnIcon(x, y, tileOpenCloseRightMenuPoint, tileOpenRightMenu,
-							tileOpenRightMenuAlpha)) {
+					if (!isMenuPanelLocked() && !isMouseOnRightMenuOpenClose(x, y, tileOpenRightMenu)) {
 						delayTime = 0;
 						setMenuPanelActive(false);
 					}
@@ -2141,7 +2242,7 @@ public static int isMouseOnAPanel(int x, int y) {
 			}
 		} else {
 			if (doEdgeMenusStuff) {
-				if (isMouseOnAnIcon(x, y, tileOpenCloseRightMenuPoint, tileOpenRightMenu, tileOpenRightMenuAlpha)) {
+				if (isMouseOnRightMenuOpenClose(x, y, tileOpenRightMenu)) {
 					setMenuPanelActive(true);
 
 					// Cerramos los menús no locked
@@ -2321,95 +2422,127 @@ public static int isMouseOnAPanel(int x, int y) {
 	}
 
 	public static boolean isMouseOnBottomPanel(int x, int y) {
-		if (y >= bottomPanelY && y < (bottomPanelY + BOTTOM_PANEL_HEIGHT)) {
-			// Dentro del panel "virtual", miramos los paneles internos con sus
-			// transparencias
+		int panelX = getScaledBottomPanelX();
+		int panelY = getScaledBottomPanelY();
+		int panelWidth = getScaledBottomPanelWidth();
+		int panelHeight = getScaledBottomPanelHeight();
 
-			if (x >= bottomPanelX && x < (bottomPanelX + BOTTOM_PANEL_WIDTH)) {
-				return (!tileBottomPanelAlpha[x - bottomPanelX][y - bottomPanelY]);
-			}
-		}
-
-		return false;
+		return x >= panelX
+				&& x < panelX + panelWidth
+				&& y >= panelY
+				&& y < panelY + panelHeight;
 	}
 
 	public static boolean isMouseOnBottomLeftScroll(int x, int y) {
-		if ((y >= bottomPanelY && y < (bottomPanelY + BOTTOM_PANEL_HEIGHT))
-				&& (x >= bottomPanelLeftScrollX && x < (bottomPanelLeftScrollX + BOTTOM_PANEL_SCROLL_WIDTH))) {
-			return !tileBottomScrollLeftAlpha[x - bottomPanelLeftScrollX][y - bottomPanelY];
-		}
+		int panelX = getScaledBottomPanelX();
+		int panelY = getScaledBottomPanelY();
+		int panelHeight = getScaledBottomPanelHeight();
+		int scrollWidth = ui(UIPanelState.BOTTOM_PANEL_SCROLL_WIDTH);
 
-		return false;
+		return x >= panelX
+				&& x < panelX + scrollWidth
+				&& y >= panelY
+				&& y < panelY + panelHeight;
 	}
 
 	public static boolean isMouseOnBottomRightScroll(int x, int y) {
-		if ((y >= bottomPanelY && y < (bottomPanelY + BOTTOM_PANEL_HEIGHT))
-				&& (x >= bottomPanelRightScrollX && x < (bottomPanelRightScrollX + BOTTOM_PANEL_SCROLL_WIDTH))) {
-			return !tileBottomScrollRightAlpha[x - bottomPanelRightScrollX][y - bottomPanelY];
-		}
+		int panelX = getScaledBottomPanelX();
+		int panelY = getScaledBottomPanelY();
+		int panelWidth = getScaledBottomPanelWidth();
+		int panelHeight = getScaledBottomPanelHeight();
+		int scrollWidth = ui(UIPanelState.BOTTOM_PANEL_SCROLL_WIDTH);
 
-		return false;
+		int rightScrollX = panelX + panelWidth - scrollWidth;
+
+		return x >= rightScrollX
+				&& x < rightScrollX + scrollWidth
+				&& y >= panelY
+				&& y < panelY + panelHeight;
 	}
 
-	/**
-	 * Indica si el mouse está en un item, devuelve el número del mismo o -1 en caso
-	 * de no estar
-	 * 
-	 * @param x
-	 * @param y
-	 * @return devuelve el número del item o -1 en caso de no estar
-	 */
 	public static int isMouseOnBottomItems(int x, int y) {
-		if (y >= bottomPanelY && y < (bottomPanelY + BOTTOM_PANEL_HEIGHT)) {
-			Point point;
-			for (int i = 0; i < BOTTOM_PANEL_NUM_ITEMS; i++) {
-				point = bottomPanelItemsPosition.get(i);
-				if (x >= point.x && x < (point.x + BOTTOM_ITEM_WIDTH)) {
-					if (!tileBottomItemAlpha[x - point.x][y - point.y]) {
-						return i;
-					}
-				}
+		int itemWidth = ui(UIPanelState.BOTTOM_ITEM_WIDTH);
+		int itemHeight = ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
+
+		for (int i = 0; i < UIPanelState.BOTTOM_PANEL_NUM_ITEMS; i++) {
+			if (i >= UIPanelState.bottomPanelItemsPosition.size()) {
+				break;
+			}
+
+			Point point = getScaledBottomItemPoint(i);
+
+			if (x >= point.x
+					&& x < point.x + itemWidth
+					&& y >= point.y
+					&& y < point.y + itemHeight) {
+				return i;
 			}
 		}
 
 		return -1;
 	}
 
-	public static boolean isMouseOnBottomSubPanel(int x, int y) {
-		if (x >= bottomSubPanelPoint.x && x < (bottomSubPanelPoint.x + BOTTOM_SUBPANEL_WIDTH)
-				&& y >= bottomSubPanelPoint.y && y < (bottomSubPanelPoint.y + BOTTOM_SUBPANEL_HEIGHT)) {
-			return true;
-		}
+	private static Point getScaledBottomSubPanelPoint() {
+		int bottomPanelX = getScaledBottomPanelX();
+		int bottomPanelY = getScaledBottomPanelY();
 
-		return false;
+		int originalOffsetX = UIPanelState.bottomSubPanelPoint.x - UIPanelState.bottomPanelX;
+		int originalOffsetY = UIPanelState.bottomSubPanelPoint.y - UIPanelState.bottomPanelY;
+
+		return new Point(
+				bottomPanelX + ui(originalOffsetX),
+				bottomPanelY + ui(originalOffsetY));
 	}
 
-	/**
-	 * Indica si el mouse está en un item del submenu de abajo, devuelve el número
-	 * del mismo o -1 en caso de no estar
-	 * 
-	 * @param x
-	 * @param y
-	 * @return devuelve el número del item o -1 en caso de no estar
-	 */
+	private static Point getScaledBottomSubPanelItemPoint(int itemIndex) {
+		Point bottomSubPanelPoint = getScaledBottomSubPanelPoint();
+
+		int originalOffsetX = UIPanelState.bottomSubPanelItemsPosition.get(itemIndex).x
+				- UIPanelState.bottomSubPanelPoint.x;
+
+		int originalOffsetY = UIPanelState.bottomSubPanelItemsPosition.get(itemIndex).y
+				- UIPanelState.bottomSubPanelPoint.y;
+
+		return new Point(
+				bottomSubPanelPoint.x + ui(originalOffsetX),
+				bottomSubPanelPoint.y + ui(originalOffsetY));
+	}
+
+	public static boolean isMouseOnBottomSubPanel(int x, int y) {
+		Point point = getScaledBottomSubPanelPoint();
+
+		int width = ui(UIPanelState.BOTTOM_SUBPANEL_WIDTH);
+		int height = ui(UIPanelState.BOTTOM_SUBPANEL_HEIGHT);
+
+		return x >= point.x
+				&& x < point.x + width
+				&& y >= point.y
+				&& y < point.y + height;
+	}
+
 	public static int isMouseOnBottomSubItems(int x, int y) {
-		if (bottomSubPanelMenu != null && y >= bottomSubPanelPoint.y
-				&& y < (bottomSubPanelPoint.y + BOTTOM_SUBPANEL_HEIGHT) && x >= bottomSubPanelPoint.x
-				&& x < (bottomSubPanelPoint.x + BOTTOM_SUBPANEL_WIDTH)) {
-			Point point;
-			bucle1: for (int y1 = 0; y1 < BOTTOM_SUBPANEL_NUM_ITEMS_Y; y1++) {
-				for (int x1 = 0; x1 < BOTTOM_SUBPANEL_NUM_ITEMS_X; x1++) {
-					int i = (y1 * BOTTOM_SUBPANEL_NUM_ITEMS_X) + x1;
-					if (i >= bottomSubPanelMenu.getItems().size()) {
-						break bucle1;
-					}
-					point = bottomSubPanelItemsPosition.get(i);
-					if (x >= point.x && x < (point.x + BOTTOM_SUBITEM_WIDTH) && y >= point.y
-							&& y < (point.y + BOTTOM_SUBITEM_HEIGHT)) {
-						if (!tileBottomSubItemAlpha[x - point.x][y - point.y]) {
-							return i;
-						}
-					}
+		if (UIPanelState.bottomSubPanelMenu == null) {
+			return -1;
+		}
+
+		int itemWidth = ui(UIPanelState.BOTTOM_SUBITEM_WIDTH);
+		int itemHeight = ui(UIPanelState.BOTTOM_SUBITEM_HEIGHT);
+
+		bucle1: for (int y1 = 0; y1 < UIPanelState.BOTTOM_SUBPANEL_NUM_ITEMS_Y; y1++) {
+			for (int x1 = 0; x1 < UIPanelState.BOTTOM_SUBPANEL_NUM_ITEMS_X; x1++) {
+				int i = (y1 * UIPanelState.BOTTOM_SUBPANEL_NUM_ITEMS_X) + x1;
+
+				if (i >= UIPanelState.bottomSubPanelMenu.getItems().size()) {
+					break bucle1;
+				}
+
+				Point point = getScaledBottomSubPanelItemPoint(i);
+
+				if (x >= point.x
+						&& x < point.x + itemWidth
+						&& y >= point.y
+						&& y < point.y + itemHeight) {
+					return i;
 				}
 			}
 		}
@@ -2436,8 +2569,110 @@ public static int isMouseOnAPanel(int x, int y) {
 	}
 
 	public static boolean isMouseOnProductionPanel(int x, int y) {
-		return ((y >= productionPanelPoint.y && y < (productionPanelPoint.y + PRODUCTION_PANEL_HEIGHT))
-				&& (x >= productionPanelPoint.x && x < (productionPanelPoint.x + PRODUCTION_PANEL_WIDTH)));
+		Point panelPoint = getScaledProductionPanelPoint();
+
+		int width = UIPanelScaler.ui(UIPanelState.PRODUCTION_PANEL_WIDTH);
+		int height = UIPanelScaler.ui(UIPanelState.PRODUCTION_PANEL_HEIGHT);
+
+		return x >= panelPoint.x
+				&& x < panelPoint.x + width
+				&& y >= panelPoint.y
+				&& y < panelPoint.y + height;
+	}
+
+	/**
+	 * Indicates if the mouse is on an item (or on the +/-) of the production panel
+	 * 
+	 * @param x
+	 * @param y
+	 * @return A dot, X is the MOUSE_ID and Y indicates the position of the item in
+	 *         the
+	 *         corresponding array
+	 */
+
+	public static Point isMouseOnProductionItems(int x, int y) {
+		if (UIPanelState.productionPanelMenu == null) {
+			return null;
+		}
+
+		int itemWidth = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
+		int itemHeight = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
+
+		int plusMinusWidth = UIPanelScaler.ui(UIPanelState.ICON_WIDTH);
+		int plusMinusHeight = UIPanelScaler.ui(UIPanelState.ICON_HEIGHT);
+
+		bucle1: for (int y1 = 0; y1 < UIPanelState.PRODUCTION_PANEL_NUM_ITEMS_Y; y1++) {
+			for (int x1 = 0; x1 < UIPanelState.PRODUCTION_PANEL_NUM_ITEMS_X; x1++) {
+				int i = (y1 * UIPanelState.PRODUCTION_PANEL_NUM_ITEMS_X) + x1;
+
+				if (i >= UIPanelState.productionPanelMenu.getItems().size()) {
+					break bucle1;
+				}
+
+				Point itemPoint = getScaledProductionItemPoint(i);
+
+				if (x >= itemPoint.x
+						&& x < itemPoint.x + itemWidth
+						&& y >= itemPoint.y
+						&& y < itemPoint.y + itemHeight) {
+					return new Point(UIPanelState.MOUSE_PRODUCTION_PANEL_ITEMS, i);
+				}
+
+				Point plusRegularPoint = getScaledProductionPlusRegularPoint(i);
+
+				if (plusRegularPoint.x != -1
+						&& x >= plusRegularPoint.x
+						&& x < plusRegularPoint.x + plusMinusWidth
+						&& y >= plusRegularPoint.y
+						&& y < plusRegularPoint.y + plusMinusHeight) {
+					return new Point(UIPanelState.MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_REGULAR, i);
+				}
+
+				Point minusRegularPoint = getScaledProductionMinusRegularPoint(i);
+
+				if (minusRegularPoint.x != -1
+						&& x >= minusRegularPoint.x
+						&& x < minusRegularPoint.x + plusMinusWidth
+						&& y >= minusRegularPoint.y
+						&& y < minusRegularPoint.y + plusMinusHeight) {
+					return new Point(UIPanelState.MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_REGULAR, i);
+				}
+
+				Point plusAutomatedPoint = getScaledProductionPlusAutomatedPoint(i);
+
+				if (plusAutomatedPoint.x != -1
+						&& x >= plusAutomatedPoint.x
+						&& x < plusAutomatedPoint.x + plusMinusWidth
+						&& y >= plusAutomatedPoint.y
+						&& y < plusAutomatedPoint.y + plusMinusHeight) {
+					return new Point(UIPanelState.MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_AUTOMATED, i);
+				}
+
+				Point minusAutomatedPoint = getScaledProductionMinusAutomatedPoint(i);
+
+				if (minusAutomatedPoint.x != -1
+						&& x >= minusAutomatedPoint.x
+						&& x < minusAutomatedPoint.x + plusMinusWidth
+						&& y >= minusAutomatedPoint.y
+						&& y < minusAutomatedPoint.y + plusMinusHeight) {
+					return new Point(UIPanelState.MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_AUTOMATED, i);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static boolean isMouseOnProductionOpenClose(int x, int y, Tile tile) {
+		Point point = getScaledProductionOpenClosePoint();
+
+		int width = UIPanelScaler.ui(tile.getTileWidth());
+		int height = UIPanelScaler.ui(tile.getTileHeight());
+
+		return x >= point.x
+				&& x < point.x + width
+				&& y >= point.y
+				&& y < point.y + height;
 	}
 
 	public static boolean isMouseOnImagesPanel(int x, int y) {
@@ -2499,30 +2734,44 @@ public static int isMouseOnAPanel(int x, int y) {
 	}
 
 	public static boolean isMouseOnMenuPanel(int x, int y) {
-		if (x >= menuPanelPoint.x && x < (menuPanelPoint.x + MENU_PANEL_WIDTH) && y >= menuPanelPoint.y
-				&& y < (menuPanelPoint.y + MENU_PANEL_HEIGHT)) {
-			return true;
-		}
+		Point panelPoint = getScaledMenuPanelPoint();
 
-		return false;
+		int width = UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH);
+		int height = UIPanelScaler.ui(UIPanelState.MENU_PANEL_HEIGHT);
+
+		return x >= panelPoint.x
+				&& x < panelPoint.x + width
+				&& y >= panelPoint.y
+				&& y < panelPoint.y + height;
 	}
 
-	public static  int isMouseOnMenuItems(int x, int y) {
-		if (y >= menuPanelPoint.y && y < (menuPanelPoint.y + MENU_PANEL_HEIGHT) && x >= menuPanelPoint.x
-				&& x < (menuPanelPoint.x + MENU_PANEL_WIDTH)) {
-			Point point;
-			bucle1: for (int y1 = 0; y1 < MENU_PANEL_NUM_ITEMS_Y; y1++) {
-				for (int x1 = 0; x1 < MENU_PANEL_NUM_ITEMS_X; x1++) {
-					int i = (y1 * MENU_PANEL_NUM_ITEMS_X) + x1;
-					if (i >= menuPanelMenu.getItems().size()) {
+	public static int isMouseOnMenuItems(int x, int y) {
+		Point panelPoint = getScaledMenuPanelPoint();
+
+		int panelWidth = UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH);
+		int panelHeight = UIPanelScaler.ui(UIPanelState.MENU_PANEL_HEIGHT);
+
+		if (y >= panelPoint.y && y < panelPoint.y + panelHeight
+				&& x >= panelPoint.x && x < panelPoint.x + panelWidth) {
+
+			int itemWidth = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
+			int itemHeight = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
+
+			bucle1: for (int y1 = 0; y1 < UIPanelState.MENU_PANEL_NUM_ITEMS_Y; y1++) {
+				for (int x1 = 0; x1 < UIPanelState.MENU_PANEL_NUM_ITEMS_X; x1++) {
+					int i = (y1 * UIPanelState.MENU_PANEL_NUM_ITEMS_X) + x1;
+
+					if (i >= UIPanelState.menuPanelMenu.getItems().size()) {
 						break bucle1;
 					}
-					point = menuPanelItemsPosition.get(i);
-					if (x >= point.x && x < (point.x + MENU_ITEM_WIDTH) && y >= point.y
-							&& y < (point.y + MENU_ITEM_HEIGHT)) {
-						if (!tileBottomItemAlpha[x - point.x][y - point.y]) {
-							return i;
-						}
+
+					Point point = getScaledMenuItemPoint(i);
+
+					if (x >= point.x
+							&& x < point.x + itemWidth
+							&& y >= point.y
+							&& y < point.y + itemHeight) {
+						return i;
 					}
 				}
 			}
@@ -2531,67 +2780,16 @@ public static int isMouseOnAPanel(int x, int y) {
 		return -1;
 	}
 
-	/**
-	 * Indica si el mouse está en un item (o en los +/-) del panel de producción
-	 * 
-	 * @param x
-	 * @param y
-	 * @return Un punto, X es el MOUSE_ID y Y indica la posición del item en el
-	 *         array correspondiente
-	 */
-	public static  Point isMouseOnProductionItems(int x, int y) {
-		if (y >= productionPanelPoint.y && y < (productionPanelPoint.y + PRODUCTION_PANEL_HEIGHT)
-				&& x >= productionPanelPoint.x && x < (productionPanelPoint.x + PRODUCTION_PANEL_WIDTH)) {
-			Point point;
-			bucle1: for (int y1 = 0; y1 < PRODUCTION_PANEL_NUM_ITEMS_Y; y1++) {
-				for (int x1 = 0; x1 < PRODUCTION_PANEL_NUM_ITEMS_X; x1++) {
-					int i = (y1 * PRODUCTION_PANEL_NUM_ITEMS_X) + x1;
-					if (i >= productionPanelMenu.getItems().size()) {
-						break bucle1;
-					}
-					point = productionPanelItemsPosition.get(i);
-					if (x >= point.x && x < (point.x + PRODUCTION_PANEL_ITEM_WIDTH) && y >= point.y
-							&& y < (point.y + PRODUCTION_PANEL_ITEM_HEIGHT)) {
-						if (!tileBottomItemAlpha[x - point.x][y - point.y]) {
-							MOUSE_PRODUCTION_PANEL_ITEMS_POINT.y = i;
-							return MOUSE_PRODUCTION_PANEL_ITEMS_POINT;
-						}
-					}
-					point = productionPanelItemsPlusRegularPosition.get(i);
-					if (point.x != -1) {
-						if (x >= point.x && x < (point.x + ICON_WIDTH) && y >= point.y && y < (point.y + ICON_HEIGHT)) {
-							if (!tileProductionPanelPlusIconAlpha[x - point.x][y - point.y]) {
-								MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_REGULAR_POINT.y = i;
-								return MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_REGULAR_POINT;
-							}
-						}
-						point = productionPanelItemsMinusRegularPosition.get(i);
-						if (x >= point.x && x < (point.x + ICON_WIDTH) && y >= point.y && y < (point.y + ICON_HEIGHT)) {
-							if (!tileProductionPanelMinusIconAlpha[x - point.x][y - point.y]) {
-								MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_REGULAR_POINT.y = i;
-								return MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_REGULAR_POINT;
-							}
-						}
-						point = productionPanelItemsPlusAutomatedPosition.get(i);
-						if (x >= point.x && x < (point.x + ICON_WIDTH) && y >= point.y && y < (point.y + ICON_HEIGHT)) {
-							if (!tileProductionPanelPlusIconAlpha[x - point.x][y - point.y]) {
-								MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_AUTOMATED_POINT.y = i;
-								return MOUSE_PRODUCTION_PANEL_ITEMS_PLUS_AUTOMATED_POINT;
-							}
-						}
-						point = productionPanelItemsMinusAutomatedPosition.get(i);
-						if (x >= point.x && x < (point.x + ICON_WIDTH) && y >= point.y && y < (point.y + ICON_HEIGHT)) {
-							if (!tileProductionPanelMinusIconAlpha[x - point.x][y - point.y]) {
-								MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_AUTOMATED_POINT.y = i;
-								return MOUSE_PRODUCTION_PANEL_ITEMS_MINUS_AUTOMATED_POINT;
-							}
-						}
-					}
-				}
-			}
-		}
+	public static boolean isMouseOnRightMenuOpenClose(int x, int y, Tile tile) {
+		Point point = getScaledRightMenuOpenClosePoint();
 
-		return null;
+		int width = UIPanelScaler.ui(tile.getTileWidth());
+		int height = UIPanelScaler.ui(tile.getTileHeight());
+
+		return x >= point.x
+				&& x < point.x + width
+				&& y >= point.y
+				&& y < point.y + height;
 	}
 
 	/**
