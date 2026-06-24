@@ -10,7 +10,7 @@ public final class TooltipScale extends AbstractScaler {
     }
 
     public TooltipScale() {
-        super(MIN_FONT_SCALE, MAX_FONT_SCALE, INITIAL_FONT_SCALE, SCALE_STEPS);
+        super(TooltipScale.class);
     }
    
     public static void cycleTooltipScale() {

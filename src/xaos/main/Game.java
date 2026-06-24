@@ -83,6 +83,9 @@ import xaos.utils.UtilsKeyboard;
 import xaos.utils.UtilsServer;
 import xaos.zones.ZoneManager;
 import xaos.panels.UI.UIPanelInputHandler;
+import xaos.panels.UI.UIPanelScaler;
+import xaos.panels.UI.UIScaler;
+
 import static xaos.panels.UI.UIPanelState.*;
 import static xaos.panels.UI.UIPanelInputHandler.*;
 import static xaos.panels.UI.UIPanel.*;
@@ -314,6 +317,11 @@ public final class Game {
 		// SMP logo a bajar antes de tiempo
 		panelMainMenu = new MainMenuPanel(0, 0, UtilsGL.getWidth(), UtilsGL.getHeight());
 		panelMainMenu.setActive(true);
+
+		// set up scalers
+		new TooltipScale();
+		new UIScaler();
+		new UIPanelScaler();
 
 		// Main loop
 		run();

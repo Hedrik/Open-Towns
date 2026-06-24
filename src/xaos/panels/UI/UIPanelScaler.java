@@ -5,13 +5,19 @@ import java.awt.Point;
 import xaos.tiles.Tile;
 import xaos.utils.UtilsGL;
 
-public final class UIPanelScaler {
 
-	private UIPanelScaler() {
+public final class UIPanelScaler extends UIScaler {
+
+	static { 
+		new xaos.panels.UI.UIScaler();
 	}
 
+	public UIPanelScaler() {
+        super(UIPanelScaler.class);
+    }
+
 	public static int ui(int value) {
-		return UIScaler.ui(value);
+		return px(value);
 	}
 
 	public static Point scalePoint(Point point) {
