@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 import xaos.actions.ActionManager;
 import xaos.actions.ActionManagerItem;
 import xaos.campaign.TutorialFlow;
+import xaos.Towns;
 import xaos.main.Game;
 import xaos.main.World;
 import xaos.panels.CommandPanel;
@@ -207,7 +208,7 @@ public class LeftPanel {
                                 && productionPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_UI) {
                             iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-                            drawScaledIcon(
+                            Towns.theGame.uiPanelScale.drawScaledIcon(
                                     tile,
                                     point,
                                     scaledItemWidth,
@@ -317,7 +318,7 @@ public class LeftPanel {
                                         .getIconType() == SmartMenu.ICON_TYPE_ITEM) {
                             iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-                            drawScaledIcon(
+                            Towns.theGame.uiPanelScale.drawScaledIcon(
                                     tile,
                                     point,
                                     scaledItemWidth,

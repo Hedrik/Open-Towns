@@ -1,8 +1,9 @@
 package xaos.panels.UI;
 
 import static xaos.panels.UI.UIPanel.*;
-import static xaos.panels.UI.UIPanelInputHandler.*;
 import static xaos.panels.UI.UIPanelScaler.*;
+import static xaos.panels.UI.UIPanelInputHandler.*;
+import xaos.Towns;
 import static xaos.panels.UI.UIPanelState.*;
 
 import java.awt.Point;
@@ -137,7 +138,7 @@ public class RightPanel {
 								&& menuPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_UI) {
 							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-							drawScaledIcon(
+							Towns.theGame.uiPanelScale.drawScaledIcon(
 									tile,
 									point,
 									scaledItemWidth,
@@ -171,7 +172,7 @@ public class RightPanel {
 								&& menuPanelMenu.getItems().get(iMenu).getIconType() == SmartMenu.ICON_TYPE_ITEM) {
 							iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-							drawScaledIcon(
+							Towns.theGame.uiPanelScale.drawScaledIcon(
 									tile,
 									point,
 									scaledItemWidth,

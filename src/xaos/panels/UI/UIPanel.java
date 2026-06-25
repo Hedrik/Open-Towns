@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import xaos.platform.lwjgl3.input.Mouse;
+import xaos.Towns;
 import xaos.TownsProperties;
 import xaos.actions.ActionManager;
 import xaos.actions.ActionManagerItem;
@@ -48,8 +49,7 @@ import xaos.utils.UtilsGL;
 import xaos.utils.UtilsIniHeaders;
 import static xaos.panels.UI.UIPanelState.*;
 import static xaos.panels.UI.UIPanelInputHandler.*;
-import static xaos.panels.UI.UIPanelScaler.*;
-
+import static xaos.Towns.theGame;
 
 public final class UIPanel {
 
@@ -437,7 +437,7 @@ public final class UIPanel {
 		}
 
 	// Rendereamos el botoncito para hacer visible/invisible el bottom panel
-Point scaledBottomOpenClosePoint = anchorFromCentreXAndBottom(
+Point scaledBottomOpenClosePoint = UIPanelScaler.anchorFromCentreXAndBottom(
 		tileOpenCloseBottomMenuPoint,
 		tileOpenBottomMenu.getTileWidth(),
 		tileOpenBottomMenu.getTileHeight(),
@@ -447,7 +447,7 @@ Point scaledBottomOpenClosePoint = anchorFromCentreXAndBottom(
 if (UIPanel.isBottomMenuPanelLocked()) {
 	iCurrentTexture = UtilsGL.setTexture(tileOpenBottomMenuON, iCurrentTexture);
 
-	drawScaledTile(
+	UIPanelScaler.drawScaledTile(
 			tileOpenBottomMenuON,
 			scaledBottomOpenClosePoint,
 			ui(tileOpenBottomMenuON.getTileWidth()),
@@ -459,7 +459,7 @@ if (UIPanel.isBottomMenuPanelLocked()) {
 		UtilsGL.setColorRed();
 	}
 
-	drawScaledTile(
+	UIPanelScaler.drawScaledTile(
 			tileOpenBottomMenu,
 			scaledBottomOpenClosePoint,
 			ui(tileOpenBottomMenu.getTileWidth()),

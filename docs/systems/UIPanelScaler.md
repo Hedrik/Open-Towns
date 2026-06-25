@@ -61,13 +61,13 @@ Scales an integer value using the current UI scale.
 Example:
 
 ```java
-int scaledWidth = UIPanelScaler.ui(BOTTOM_ITEM_WIDTH);
+int scaledWidth = Towns.theGame.uiPanelScale.ui(BOTTOM_ITEM_WIDTH);
 ```
 
 This is a shortcut for:
 
 ```java
-UIScaler.ui(value);
+Towns.theGame.uiScale.ui(value);
 ```
 
 ---
@@ -341,7 +341,7 @@ Example:
 
 ```java
 private static Point getScaledProductionOpenClosePoint(Tile tile) {
-	int scaledHeight = UIPanelScaler.ui(tile.getTileHeight());
+	int scaledHeight = Towns.theGame.uiPanelScale.ui(tile.getTileHeight());
 
 	int originalCenterY = UIPanelState.tileOpenCloseProductionPanelPoint.y
 			+ (tile.getTileHeight() / 2);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import xaos.platform.lwjgl3.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import xaos.Towns;
 import xaos.TownsProperties;
 
 import xaos.campaign.TutorialFlow;
@@ -3488,11 +3489,11 @@ public final class MainPanel {
 			return;
 		}
 
-		int scaledSeparator = TooltipScale.px(separator);
-		int lineGap = TooltipScale.px(5);
-		int lineHeight = TooltipScale.fontHeight() + lineGap;
-		int paddingX = TooltipScale.px(4);
-		int paddingY = TooltipScale.px(4);
+		int scaledSeparator = Towns.theGame.tooltipScale.px(separator);
+		int lineGap = Towns.theGame.tooltipScale.px(5);
+		int lineHeight = Towns.theGame.tooltipScale.fontHeight() + lineGap;
+		int paddingX = Towns.theGame.tooltipScale.px(4);
+		int paddingY = Towns.theGame.tooltipScale.px(4);
 
 		int width = getMessagesTooltipWidth(messages, paddingX);
 		int height = getMessagesTooltipHeight(messages, lineHeight, lineGap, paddingY);
@@ -3519,7 +3520,7 @@ public final class MainPanel {
 		int width = 0;
 
 		for (int i = 0; i < messages.size(); i++) {
-			int messageWidth = TooltipScale.textWidth(messages.get(i));
+			int messageWidth = Towns.theGame.tooltipScale.textWidth(messages.get(i));
 
 			if (messageWidth > width) {
 				width = messageWidth;

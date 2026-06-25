@@ -25,6 +25,7 @@ import xaos.data.SoldierGroups;
 import xaos.effects.EffectManager;
 import xaos.events.EventManager;
 import xaos.events.EventManagerItem;
+import xaos.Towns;
 import xaos.main.Game;
 import xaos.main.World;
 import xaos.panels.MainPanel;
@@ -75,22 +76,22 @@ public final class TooltipRenderer {
 
 	public static Point centeredAbove(int centerX, int bottomY, String text) {
 		return new Point(
-				centerX - TooltipScale.textWidth(text) / 2,
-				bottomY - TooltipScale.fontHeight() * 2);
+				centerX - Towns.theGame.tooltipScale.textWidth(text) / 2,
+				bottomY - Towns.theGame.tooltipScale.fontHeight() * 2);
 	}
 
 	public static Point centeredBelow(int centerX, int topY, String text) {
 		return new Point(
-				centerX - TooltipScale.textWidth(text) / 2,
-				topY + TooltipScale.fontHeight() * 2);
+				centerX - Towns.theGame.tooltipScale.textWidth(text) / 2,
+				topY + Towns.theGame.tooltipScale.fontHeight() * 2);
 	}
 
 	public static Point rightOf(int x, int y) {
-		return new Point(x + TooltipScale.px(32), y);
+		return new Point(x + Towns.theGame.tooltipScale.px(32), y);
 	}
 
 	public static Point leftOf(int x, int y, String text) {
-		return new Point(x - TooltipScale.textWidth(text), y);
+		return new Point(x - Towns.theGame.tooltipScale.textWidth(text), y);
 	}
 
 	public static void draw(String tooltip, int tooltipX, int tooltipY, int renderWidth, int renderHeight) {
@@ -98,12 +99,12 @@ public final class TooltipRenderer {
 			return;
 		}
 
-		int paddingX = TooltipScale.px(6);
-		int paddingY = TooltipScale.px(3);
-		int safetyPadding = TooltipScale.px(4);
+		int paddingX = Towns.theGame.tooltipScale.px(6);
+		int paddingY = Towns.theGame.tooltipScale.px(3);
+		int safetyPadding = Towns.theGame.tooltipScale.px(4);
 
-		int tooltipWidth = TooltipScale.textWidth(tooltip) + paddingX * 2 + safetyPadding;
-		int tooltipHeight = TooltipScale.fontHeight() + paddingY * 2;
+		int tooltipWidth = Towns.theGame.tooltipScale.textWidth(tooltip) + paddingX * 2 + safetyPadding;
+		int tooltipHeight = Towns.theGame.tooltipScale.fontHeight() + paddingY * 2;
 
 		Point tooltipPosition = clampTooltipPosition(
 				tooltipX,
@@ -188,15 +189,15 @@ public final class TooltipRenderer {
 
 			UtilsGL.drawTexture(
 					xOffset,
-					y + TooltipScale.px(charDef.yoffset),
-					xOffset + TooltipScale.px(charDef.width),
-					y + TooltipScale.px(charDef.yoffset) + TooltipScale.px(charDef.height),
+					y + Towns.theGame.tooltipScale.px(charDef.yoffset),
+					xOffset + Towns.theGame.tooltipScale.px(charDef.width),
+					y + Towns.theGame.tooltipScale.px(charDef.yoffset) + Towns.theGame.tooltipScale.px(charDef.height),
 					charDef.xTex,
 					charDef.yTex,
 					charDef.xTex + charDef.widthTex,
 					charDef.yTex + charDef.heightTex);
 
-			xOffset += TooltipScale.px(charDef.xadvance);
+			xOffset += Towns.theGame.tooltipScale.px(charDef.xadvance);
 		}
 	}
 
@@ -300,7 +301,7 @@ public final class TooltipRenderer {
 
 				MainPanel.renderMessages(x,
 						bottomSubPanelPoint.y
-								- (item.getPrerequisites().size() * (TooltipScale.fontHeight() + TooltipScale.px(5))),
+								- (item.getPrerequisites().size() * (Towns.theGame.tooltipScale.fontHeight() + Towns.theGame.tooltipScale.px(5))),
 						renderWidth, renderHeight,
 						Tile.TERRAIN_ICON_WIDTH / 2,
 						item.getPrerequisites(),
@@ -637,7 +638,7 @@ public final class TooltipRenderer {
 			tooltip = Messages.getString("UIPanel.73"); //$NON-NLS-1$
 
 			tooltipPoint = new Point(
-					x - TooltipScale.textWidth(tooltip) / 2,
+					x - Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 					livingsPanelIconRestrictUpPoint.y + tileIconLevelUp.getTileHeight());
 
 		} else if ((mousePanel == MOUSE_LIVINGS_PANEL_BUTTONS_RESTRICT_UP
@@ -647,7 +648,7 @@ public final class TooltipRenderer {
 			tooltip = Messages.getString("UIPanel.74"); //$NON-NLS-1$
 
 			tooltipPoint = new Point(
-					x - TooltipScale.textWidth(tooltip) / 2,
+					x - Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 					livingsPanelIconRestrictUpPoint.y + tileIconLevelUp.getTileHeight());
 
 		} else if (mousePanel == MOUSE_LIVINGS_PANEL_CGROUP_NOGROUP) {
@@ -656,8 +657,8 @@ public final class TooltipRenderer {
 					+ Game.getWorld().getCitizenGroups().getCitizensWithoutGroup().size() + ")"; //$NON-NLS-1$
 
 			tooltipPoint = new Point(
-					x - TooltipScale.textWidth(tooltip) / 2,
-					y - TooltipScale.fontHeight() - TooltipScale.px(2));
+					x - Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+					y - Towns.theGame.tooltipScale.fontHeight() - Towns.theGame.tooltipScale.px(2));
 
 		} else if (mousePanel == MOUSE_LIVINGS_PANEL_CGROUP_GROUP) {
 
@@ -678,8 +679,8 @@ public final class TooltipRenderer {
 					+ Game.getWorld().getSoldierGroups().getSoldiersWithoutGroup().size() + ")"; //$NON-NLS-1$
 
 			tooltipPoint = new Point(
-					x - TooltipScale.textWidth(tooltip) / 2,
-					y - TooltipScale.fontHeight() - TooltipScale.px(2));
+					x - Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+					y - Towns.theGame.tooltipScale.fontHeight() - Towns.theGame.tooltipScale.px(2));
 
 		} else if (mousePanel == MOUSE_LIVINGS_PANEL_SGROUP_GROUP) {
 
@@ -692,8 +693,8 @@ public final class TooltipRenderer {
 					tooltip = sgd.getName() + " (" + sgd.getLivingIDs().size() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
 					tooltipPoint = new Point(
-							x - TooltipScale.textWidth(tooltip) / 2,
-							y - TooltipScale.fontHeight() - TooltipScale.px(2));
+							x - Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+							y - Towns.theGame.tooltipScale.fontHeight() - Towns.theGame.tooltipScale.px(2));
 				}
 			}
 		} else if (mousePanel == MOUSE_LIVINGS_PANEL_BUTTONS_ROWS
@@ -711,134 +712,134 @@ public final class TooltipRenderer {
 	static {
 		TOOLTIP_POINTS.put(MOUSE_DATEPANEL, tooltip -> new Point(
 				datePanelPoint.x + tileDatePanel.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				datePanelPoint.y + tileDatePanel.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_LEVEL_UP, tooltip -> new Point(
 				iconLevelUpPoint.x + tileIconLevelUp.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconLevelUpPoint.y - TooltipScale.fontHeight()));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconLevelUpPoint.y - Towns.theGame.tooltipScale.fontHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_LEVEL_DOWN, tooltip -> new Point(
 				iconLevelDownPoint.x + tileIconLevelDown.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconLevelDownPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconLevelDownPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_LEVEL, tooltip -> new Point(
 				iconLevelPoint.x + tileIconLevel.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconLevelPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconLevelPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_CITIZEN_PREVIOUS, tooltip -> new Point(
 				iconCitizenPreviousPoint.x + tileIconCitizenPrevious.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconCitizenPreviousPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_CITIZEN_NEXT, tooltip -> new Point(
 				iconCitizenNextPoint.x + tileIconCitizenNext.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconCitizenNextPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_SOLDIER_PREVIOUS, tooltip -> new Point(
 				iconSoldierPreviousPoint.x + tileIconSoldierPrevious.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconSoldierPreviousPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_SOLDIER_NEXT, tooltip -> new Point(
 				iconSoldierNextPoint.x + tileIconSoldierNext.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconSoldierNextPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_HERO_PREVIOUS, tooltip -> new Point(
 				iconHeroPreviousPoint.x + tileIconHeroPrevious.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconHeroPreviousPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_HERO_NEXT, tooltip -> new Point(
 				iconHeroNextPoint.x + tileIconHeroNext.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconHeroNextPoint.y + tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_INFO_NUM_SOLDIERS, tooltip -> new Point(
 				iconNumSoldiersBackgroundPoint.x
 						+ tileBottomItem.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconNumSoldiersBackgroundPoint.y
 						+ tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_INFO_NUM_HEROES, tooltip -> new Point(
 				iconNumHeroesBackgroundPoint.x
 						+ tileBottomItem.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconNumHeroesBackgroundPoint.y
 						+ tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_INFO_CARAVAN, tooltip -> new Point(
 				iconCaravanBackgroundPoint.x
 						+ tileBottomItem.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
 				iconCaravanBackgroundPoint.y
 						+ tileBottomItem.getTileHeight()));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_PRIORITIES, tooltip -> new Point(
 				iconPrioritiesPoint.x
 						+ tileIconPriorities.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconPrioritiesPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconPrioritiesPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_MATS, tooltip -> new Point(
 				iconMatsPoint.x
 						+ tileIconMats.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconMatsPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconMatsPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_GRID, tooltip -> new Point(
 				iconGridPoint.x
 						+ tileIconGrid.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconGridPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconGridPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_MINIBLOCKS, tooltip -> new Point(
 				iconMiniblocksPoint.x
 						+ tileIconMiniblocks.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconMiniblocksPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconMiniblocksPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_FLATMOUSE, tooltip -> new Point(
 				iconFlatMousePoint.x
 						+ tileIconFlatMouse.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconFlatMousePoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconFlatMousePoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_3DMOUSE, tooltip -> new Point(
 				icon3DMousePoint.x
 						+ tileIcon3DMouse.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				icon3DMousePoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				icon3DMousePoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_PAUSE_RESUME, tooltip -> new Point(
 				iconPauseResumePoint.x
 						+ tileIconPause.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconPauseResumePoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconPauseResumePoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_SETTINGS, tooltip -> new Point(
 				iconSettingsPoint.x
 						+ tileIconSettings.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconSettingsPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconSettingsPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_LOWER_SPEED, tooltip -> new Point(
 				iconLowerSpeedPoint.x
 						+ tileIconLowerSpeed.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconLowerSpeedPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconLowerSpeedPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 
 		TOOLTIP_POINTS.put(MOUSE_ICON_INCREASE_SPEED, tooltip -> new Point(
 				iconIncreaseSpeedPoint.x
 						+ tileIconIncreaseSpeed.getTileWidth() / 2
-						- TooltipScale.textWidth(tooltip) / 2,
-				iconIncreaseSpeedPoint.y + TooltipScale.fontHeight() * 2));
+						- Towns.theGame.tooltipScale.textWidth(tooltip) / 2,
+				iconIncreaseSpeedPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2));
 	}
 	private static final Map<Integer, Supplier<String>> TOOLTIP_MESSAGES = new HashMap<>();
 
@@ -1000,7 +1001,7 @@ public final class TooltipRenderer {
 		}
 
 		int tooltipX = iconPoint.x;
-		int tooltipY = iconPoint.y + TooltipScale.fontHeight() * 2;
+		int tooltipY = iconPoint.y + Towns.theGame.tooltipScale.fontHeight() * 2;
 
 		MainPanel.renderMessages(
 				tooltipX,
@@ -1110,13 +1111,13 @@ public final class TooltipRenderer {
 
 		String eventsTooltip = Messages.getString("UIPanel.84"); //$NON-NLS-1$
 
-		int paddingX = TooltipScale.px(4);
-		int paddingY = TooltipScale.px(4);
-		int rowGap = TooltipScale.px(2);
-		int iconTextGap = TooltipScale.px(4);
+		int paddingX = Towns.theGame.tooltipScale.px(4);
+		int paddingY = Towns.theGame.tooltipScale.px(4);
+		int rowGap = Towns.theGame.tooltipScale.px(2);
+		int iconTextGap = Towns.theGame.tooltipScale.px(4);
 
-		int tooltipWidth = TooltipScale.textWidth(eventsTooltip);
-		int tooltipHeight = TooltipScale.fontHeight();
+		int tooltipWidth = Towns.theGame.tooltipScale.textWidth(eventsTooltip);
+		int tooltipHeight = Towns.theGame.tooltipScale.fontHeight();
 
 		EventData eventData;
 		EventManagerItem eventItem;
@@ -1132,17 +1133,17 @@ public final class TooltipRenderer {
 			}
 
 			if (eventItem.getIcon() != null) {
-				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), TooltipScale.fontHeight());
+				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), Towns.theGame.tooltipScale.fontHeight());
 				tooltipHeight += rowHeight + rowGap;
 
-				rowWidth = TooltipScale.textWidth(eventItem.getName())
+				rowWidth = Towns.theGame.tooltipScale.textWidth(eventItem.getName())
 						+ eventItem.getIcon().getTileWidth()
 						+ iconTextGap;
 			} else {
-				rowHeight = TooltipScale.fontHeight();
+				rowHeight = Towns.theGame.tooltipScale.fontHeight();
 				tooltipHeight += rowHeight + rowGap;
 
-				rowWidth = TooltipScale.textWidth(eventItem.getName());
+				rowWidth = Towns.theGame.tooltipScale.textWidth(eventItem.getName());
 			}
 
 			if (rowWidth > tooltipWidth) {
@@ -1182,7 +1183,7 @@ public final class TooltipRenderer {
 				tileTooltipBackground.getTileSetTexX1(),
 				tileTooltipBackground.getTileSetTexY1());
 
-		int currentY = tooltipY + paddingY + TooltipScale.fontHeight() + rowGap;
+		int currentY = tooltipY + paddingY + Towns.theGame.tooltipScale.fontHeight() + rowGap;
 
 		for (int i = 0; i < alEvents.size(); i++) {
 			eventData = alEvents.get(i);
@@ -1193,7 +1194,7 @@ public final class TooltipRenderer {
 			}
 
 			if (eventItem.getIcon() != null) {
-				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), TooltipScale.fontHeight());
+				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), Towns.theGame.tooltipScale.fontHeight());
 				iCurrentTexture = UtilsGL.setTexture(eventItem.getIcon(), iCurrentTexture);
 
 				UIPanel.drawTile(
@@ -1204,7 +1205,7 @@ public final class TooltipRenderer {
 
 				currentY += rowHeight + rowGap;
 			} else {
-				currentY += TooltipScale.fontHeight() + rowGap;
+				currentY += Towns.theGame.tooltipScale.fontHeight() + rowGap;
 			}
 		}
 
@@ -1221,7 +1222,7 @@ public final class TooltipRenderer {
 				tooltipX + paddingX,
 				currentY);
 
-		currentY += TooltipScale.fontHeight() + rowGap;
+		currentY += Towns.theGame.tooltipScale.fontHeight() + rowGap;
 
 		for (int i = 0; i < alEvents.size(); i++) {
 			eventData = alEvents.get(i);
@@ -1232,11 +1233,11 @@ public final class TooltipRenderer {
 			}
 
 			if (eventItem.getIcon() != null) {
-				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), TooltipScale.fontHeight());
+				rowHeight = Math.max(eventItem.getIcon().getTileHeight(), Towns.theGame.tooltipScale.fontHeight());
 				TooltipRenderer.drawScaledString(
 						eventItem.getName(),
 						tooltipX + paddingX + eventItem.getIcon().getTileWidth() + iconTextGap,
-						currentY + rowHeight / 2 - TooltipScale.fontHeight() / 2);
+						currentY + rowHeight / 2 - Towns.theGame.tooltipScale.fontHeight() / 2);
 
 				currentY += rowHeight + rowGap;
 			} else {
@@ -1245,7 +1246,7 @@ public final class TooltipRenderer {
 						tooltipX + paddingX,
 						currentY);
 
-				currentY += TooltipScale.fontHeight() + rowGap;
+				currentY += Towns.theGame.tooltipScale.fontHeight() + rowGap;
 			}
 		}
 

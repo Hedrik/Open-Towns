@@ -11,6 +11,7 @@ import xaos.data.GlobalEventData;
 import xaos.data.SoldierData;
 import xaos.data.SoldierGroupData;
 import xaos.data.SoldierGroups;
+import xaos.Towns;
 import xaos.main.Game;
 import xaos.main.World;
 import xaos.panels.CommandPanel;
@@ -40,15 +41,15 @@ import java.awt.Color;
 
 public class UIPanelInputHandler {
 
-	private static int ui(int value) {
-		return UIScaler.ui(value);
+	protected static int ui(int value) {
+		return Towns.theGame.uiScale.ui(value);
 	}
 
 	private static Point getScaledMenuPanelPoint() {
 		return UIPanelScaler.anchorFromRight(
 				UIPanelState.menuPanelPoint,
 				UIPanelState.MENU_PANEL_WIDTH,
-				UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH));
+				Towns.theGame.uiPanelScale.ui(UIPanelState.MENU_PANEL_WIDTH));
 	}
 
 	private static Point getScaledMenuItemPoint(int itemIndex) {
@@ -2571,8 +2572,8 @@ public class UIPanelInputHandler {
 	public static boolean isMouseOnProductionPanel(int x, int y) {
 		Point panelPoint = getScaledProductionPanelPoint();
 
-		int width = UIPanelScaler.ui(UIPanelState.PRODUCTION_PANEL_WIDTH);
-		int height = UIPanelScaler.ui(UIPanelState.PRODUCTION_PANEL_HEIGHT);
+		int width = Towns.theGame.uiPanelScale.ui(UIPanelState.PRODUCTION_PANEL_WIDTH);
+		int height = Towns.theGame.uiPanelScale.ui(UIPanelState.PRODUCTION_PANEL_HEIGHT);
 
 		return x >= panelPoint.x
 				&& x < panelPoint.x + width
@@ -2595,11 +2596,11 @@ public class UIPanelInputHandler {
 			return null;
 		}
 
-		int itemWidth = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
-		int itemHeight = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
+		int itemWidth = Towns.theGame.uiPanelScale.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
+		int itemHeight = Towns.theGame.uiPanelScale.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
 
-		int plusMinusWidth = UIPanelScaler.ui(UIPanelState.ICON_WIDTH);
-		int plusMinusHeight = UIPanelScaler.ui(UIPanelState.ICON_HEIGHT);
+		int plusMinusWidth = Towns.theGame.uiPanelScale.ui(UIPanelState.ICON_WIDTH);
+		int plusMinusHeight = Towns.theGame.uiPanelScale.ui(UIPanelState.ICON_HEIGHT);
 
 		bucle1: for (int y1 = 0; y1 < UIPanelState.PRODUCTION_PANEL_NUM_ITEMS_Y; y1++) {
 			for (int x1 = 0; x1 < UIPanelState.PRODUCTION_PANEL_NUM_ITEMS_X; x1++) {
@@ -2666,8 +2667,8 @@ public class UIPanelInputHandler {
 	public static boolean isMouseOnProductionOpenClose(int x, int y, Tile tile) {
 		Point point = getScaledProductionOpenClosePoint();
 
-		int width = UIPanelScaler.ui(tile.getTileWidth());
-		int height = UIPanelScaler.ui(tile.getTileHeight());
+		int width = Towns.theGame.uiPanelScale.ui(tile.getTileWidth());
+		int height = Towns.theGame.uiPanelScale.ui(tile.getTileHeight());
 
 		return x >= point.x
 				&& x < point.x + width
@@ -2736,8 +2737,8 @@ public class UIPanelInputHandler {
 	public static boolean isMouseOnMenuPanel(int x, int y) {
 		Point panelPoint = getScaledMenuPanelPoint();
 
-		int width = UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH);
-		int height = UIPanelScaler.ui(UIPanelState.MENU_PANEL_HEIGHT);
+		int width = Towns.theGame.uiPanelScale.ui(UIPanelState.MENU_PANEL_WIDTH);
+		int height = Towns.theGame.uiPanelScale.ui(UIPanelState.MENU_PANEL_HEIGHT);
 
 		return x >= panelPoint.x
 				&& x < panelPoint.x + width
@@ -2748,14 +2749,14 @@ public class UIPanelInputHandler {
 	public static int isMouseOnMenuItems(int x, int y) {
 		Point panelPoint = getScaledMenuPanelPoint();
 
-		int panelWidth = UIPanelScaler.ui(UIPanelState.MENU_PANEL_WIDTH);
-		int panelHeight = UIPanelScaler.ui(UIPanelState.MENU_PANEL_HEIGHT);
+		int panelWidth = Towns.theGame.uiPanelScale.ui(UIPanelState.MENU_PANEL_WIDTH);
+		int panelHeight = Towns.theGame.uiPanelScale.ui(UIPanelState.MENU_PANEL_HEIGHT);
 
 		if (y >= panelPoint.y && y < panelPoint.y + panelHeight
 				&& x >= panelPoint.x && x < panelPoint.x + panelWidth) {
 
-			int itemWidth = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
-			int itemHeight = UIPanelScaler.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
+			int itemWidth = Towns.theGame.uiPanelScale.ui(UIPanelState.BOTTOM_ITEM_WIDTH);
+			int itemHeight = Towns.theGame.uiPanelScale.ui(UIPanelState.BOTTOM_ITEM_HEIGHT);
 
 			bucle1: for (int y1 = 0; y1 < UIPanelState.MENU_PANEL_NUM_ITEMS_Y; y1++) {
 				for (int x1 = 0; x1 < UIPanelState.MENU_PANEL_NUM_ITEMS_X; x1++) {
@@ -2783,8 +2784,8 @@ public class UIPanelInputHandler {
 	public static boolean isMouseOnRightMenuOpenClose(int x, int y, Tile tile) {
 		Point point = getScaledRightMenuOpenClosePoint();
 
-		int width = UIPanelScaler.ui(tile.getTileWidth());
-		int height = UIPanelScaler.ui(tile.getTileHeight());
+		int width = Towns.theGame.uiPanelScale.ui(tile.getTileWidth());
+		int height = Towns.theGame.uiPanelScale.ui(tile.getTileHeight());
 
 		return x >= point.x
 				&& x < point.x + width

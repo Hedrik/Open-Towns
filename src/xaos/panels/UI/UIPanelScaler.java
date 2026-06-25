@@ -2,35 +2,38 @@ package xaos.panels.UI;
 
 import java.awt.Point;
 
+import xaos.Towns;
 import xaos.tiles.Tile;
 import xaos.utils.UtilsGL;
 
 
 public final class UIPanelScaler extends UIScaler {
-
+/*
 	static { 
 		new xaos.panels.UI.UIScaler();
 	}
-
+*/
+	
 	public UIPanelScaler() {
         super(UIPanelScaler.class);
     }
 
-	public static int ui(int value) {
+	public int ui(int value) {
 		return px(value);
 	}
 
-	public static Point scalePoint(Point point) {
+	public Point scalePoint(Point point) {
 		return new Point(ui(point.x), ui(point.y));
 	}
+
 
 	public static Point scalePointFromAnchor(Point originalPoint, Point originalAnchor, Point scaledAnchor) {
 		int offsetX = originalPoint.x - originalAnchor.x;
 		int offsetY = originalPoint.y - originalAnchor.y;
 
 		return new Point(
-				scaledAnchor.x + ui(offsetX),
-				scaledAnchor.y + ui(offsetY));
+				scaledAnchor.x + Towns.theGame.uiPanelScale.ui(offsetX),
+				scaledAnchor.y + Towns.theGame.uiPanelScale.ui(offsetY));
 	}
 
 	public static Point scalePanelFromCentreX(Point originalPoint, int originalWidth, int scaledWidth) {
@@ -79,7 +82,7 @@ public final class UIPanelScaler extends UIScaler {
 				tile.getTileSetTexY1());
 	}
 
-	public static void drawScaledTile(Tile tile, Point point) {
+	public void drawScaledTile(Tile tile, Point point) {
 		drawScaledTile(
 				tile,
 				point,
@@ -87,11 +90,11 @@ public final class UIPanelScaler extends UIScaler {
 				ui(tile.getTileHeight()));
 	}
 
-	public static void drawScaledIcon(Tile tile, Point buttonPoint, int buttonWidth, int buttonHeight) {
+	public void drawScaledIcon(Tile tile, Point buttonPoint, int buttonWidth, int buttonHeight) {
 		drawScaledIcon(tile, buttonPoint, buttonWidth, buttonHeight, 6);
 	}
 
-	public static void drawScaledIcon(Tile tile, Point buttonPoint, int buttonWidth, int buttonHeight, int inset) {
+	public void drawScaledIcon(Tile tile, Point buttonPoint, int buttonWidth, int buttonHeight, int inset) {
 		int iconInset = ui(inset);
 
 		int iconX = buttonPoint.x + iconInset;

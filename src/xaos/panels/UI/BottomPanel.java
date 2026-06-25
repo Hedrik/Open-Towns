@@ -1,9 +1,14 @@
 package xaos.panels.UI;
 
 import static xaos.panels.UI.UIPanelScaler.*;
+import static xaos.panels.UI.UIPanelInputHandler.*;
+import static xaos.panels.UI.UIPanel.*;
+import static xaos.panels.UI.UIPanelState.*;
 
+import xaos.Towns;
 import xaos.campaign.TutorialFlow;
 import xaos.panels.menus.SmartMenu;
+import xaos.panels.UI.UIPanelScaler;
 import xaos.tiles.Tile;
 import xaos.utils.UtilsGL;
 
@@ -183,7 +188,7 @@ public class BottomPanel {
 			if (tile != null && UIPanelState.currentMenu.getItems().get(i).getIconType() == SmartMenu.ICON_TYPE_UI) {
 				iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-				drawScaledIcon(
+				Towns.theGame.uiPanelScale.drawScaledIcon(
 						tile,
 						point,
 						bottomItemWidth,
@@ -285,7 +290,7 @@ public class BottomPanel {
 									.getIconType() == SmartMenu.ICON_TYPE_UI) {
 						iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-						drawScaledIcon(
+						Towns.theGame.uiPanelScale.drawScaledIcon(
 								tile,
 								point,
 								bottomItemWidth,
@@ -316,7 +321,7 @@ public class BottomPanel {
 			if (tile != null && UIPanelState.currentMenu.getItems().get(i).getIconType() == SmartMenu.ICON_TYPE_ITEM) {
 				iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-				drawScaledIcon(
+				Towns.theGame.uiPanelScale.drawScaledIcon(
 						tile,
 						point,
 						bottomItemWidth,
@@ -348,7 +353,7 @@ public class BottomPanel {
 									.getIconType() == SmartMenu.ICON_TYPE_ITEM) {
 						iCurrentTexture = UtilsGL.setTexture(tile, iCurrentTexture);
 
-						drawScaledIcon(
+						Towns.theGame.uiPanelScale.drawScaledIcon(
 								tile,
 								point,
 								bottomItemWidth,

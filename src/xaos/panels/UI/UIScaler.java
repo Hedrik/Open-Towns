@@ -15,25 +15,25 @@ public class UIScaler extends AbstractScaler {
         super(UIScaler.class);
     }
 
-    protected UIScaler(final Class<? extends AbstractScaler> tc)
+    protected UIScaler(final Class<? extends UIScaler> tc)
 			throws NullPointerException, ExceptionInInitializerError  {
 		super(tc);
 	}
 
 
-	public static float getUIScale() {
+	public float getUIScale() {
 		return get();
 	}
 
-	public static void setUIScale(float scale) {
+	public void setUIScale(float scale) {
 		set(scale);
 	}
 
-	public static void cycleUIScale() {
+	public void cycleUIScale() {
 		cycleScale();
 	}
 
-	public static int ui(int value) {
+	public int ui(int value) {
 		return px(value);
 	}
 

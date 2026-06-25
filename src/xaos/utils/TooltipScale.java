@@ -13,7 +13,7 @@ public final class TooltipScale extends AbstractScaler {
         super(TooltipScale.class);
     }
    
-    public static void cycleTooltipScale() {
+    public void cycleTooltipScale() {
         cycleScale();
     }
 

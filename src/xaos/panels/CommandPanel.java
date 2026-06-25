@@ -1031,7 +1031,7 @@ public final class CommandPanel {
                 UtilsGL.toggleFullScreen();
                 Utils.saveOptions();
             } else if (sCommand.equals(COMMAND_MM_UI_SCALE)) {
-                UIScaler.cycleUIScale();
+                Towns.theGame.uiScale.cycleUIScale();
                 Utils.saveOptions();
 
             } else if (sCommand.equals(COMMAND_MM_WORLD_ZOOM)) {
@@ -1039,7 +1039,7 @@ public final class CommandPanel {
                 Utils.saveOptions();
 
             } else if (sCommand.equals(COMMAND_MM_TOOLTIP_SCALE)) {
-                TooltipScale.cycleTooltipScale();
+                Towns.theGame.tooltipScale.cycleTooltipScale();
                 Utils.saveOptions();
             } else if (sCommand.equals(COMMAND_MM_SWITCH_MOUSE_SCROLL)) {
                 Game.setMouseScrollON(!Game.isMouseScrollON());

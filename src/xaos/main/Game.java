@@ -159,6 +159,11 @@ public final class Game {
 	public static UIPanel panelUI;
 	private static MessagesPanel panelMessages;
 
+	// scaling
+	public TooltipScale tooltipScale;
+	public UIScaler uiScale;
+	public UIPanelScaler uiPanelScale;
+
 	private static World world;
 	private static boolean musicON;
 	private static boolean FXON;
@@ -297,6 +302,11 @@ public final class Game {
 		// Depths
 		Cell.generateDepths();
 
+		// set up scaling classes
+		uiScale = new UIScaler();
+		uiPanelScale = new UIPanelScaler();
+		tooltipScale = new TooltipScale();
+
 		// Cargamos los paneles
 		panelMain = new MainPanel();
 		panelUI = new UIPanel();
@@ -318,14 +328,10 @@ public final class Game {
 		panelMainMenu = new MainMenuPanel(0, 0, UtilsGL.getWidth(), UtilsGL.getHeight());
 		panelMainMenu.setActive(true);
 
-		// set up scalers
-		new TooltipScale();
-		new UIScaler();
-		new UIPanelScaler();
-
+/*
 		// Main loop
 		run();
-
+*/
 	}
 
 	public static void loadAllIniTextures() {
@@ -1301,13 +1307,13 @@ public static void taskCreated(Task task) {
 					}
 				} else {
 					if (iKEY == Keyboard.KEY_ADD || iKEY == Keyboard.KEY_EQUALS) {
-						TooltipScale.set(TooltipScale.get() + 0.25f);
+						tooltipScale.set(tooltipScale.get() + 0.25f);
 						
 						continue;
 					}
 
 					if (iKEY == Keyboard.KEY_SUBTRACT || iKEY == Keyboard.KEY_MINUS) {
-						TooltipScale.set(TooltipScale.get() - 0.25f);
+						tooltipScale.set(tooltipScale.get() - 0.25f);
 					
 						continue;
 					}

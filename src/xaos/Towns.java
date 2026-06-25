@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import xaos.main.Game;
+import xaos.panels.UI.UIPanelScaler;
+import xaos.panels.UI.UIScaler;
 import xaos.utils.JNASteamAPI;
 import xaos.utils.Log;
 import xaos.utils.Messages;
+import xaos.utils.TooltipScale;
 
 import com.sun.jna.Native;
 import xaos.property.Property;
@@ -26,6 +29,9 @@ public final class Towns {
     // Properties in ini files
     public static Properties propertiesMain;
     public static Properties propertiesGraphics;
+
+    // reference to the running game instance for other classes to use
+    public static Game theGame;
 
     public static boolean loadSteamAPI(String sLibName) {
         String mappedLibraryName = System.mapLibraryName(sLibName);
@@ -64,7 +70,7 @@ public final class Towns {
 
         // Lanzamos la ventana principal
         try {
-            new Game();
+            theGame = new Game();
         } catch (Throwable t) {
             try {
                 Writer writer = new StringWriter();
@@ -80,6 +86,7 @@ public final class Towns {
 
             Game.exit();
         }
+        theGame.run();
     }
 
     public native boolean SteamAPI_Init();
